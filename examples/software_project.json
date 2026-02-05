@@ -1,0 +1,37 @@
+{
+    "project_name": "Web App MVP",
+    "project_type": "software",
+    "rules": [
+        {
+            "name": "README exists",
+            "description": "El proyecto debe tener un archivo README.md",
+            "type": "file_exists",
+            "target": "README.md",
+            "severity": "error",
+            "remediation": "Crear un archivo README.md en la raíz."
+        },
+        {
+            "name": "Source directory exists",
+            "description": "El código fuente debe estar en la carpeta src/",
+            "type": "dir_exists",
+            "target": "src",
+            "severity": "error"
+        },
+        {
+            "name": "Python dependencies",
+            "description": "Debe existir un archivo de dependencias",
+            "type": "file_exists",
+            "target": "requirements.txt",
+            "severity": "warning",
+            "remediation": "Generar requirements.txt usando pip freeze."
+        },
+        {
+            "name": "Version check",
+            "description": "El archivo README debe mencionar la versión 0.1.0",
+            "type": "file_contains",
+            "target": "README.md",
+            "pattern": "0\\.1\\.0",
+            "severity": "info"
+        }
+    ]
+}

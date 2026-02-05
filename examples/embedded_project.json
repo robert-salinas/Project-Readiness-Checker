@@ -1,0 +1,28 @@
+{
+    "project_name": "Smart Thermostat",
+    "project_type": "embedded",
+    "rules": [
+        {
+            "name": "Toolchain check",
+            "description": "Verificar si arm-none-eabi-gcc está instalado",
+            "type": "command_success",
+            "target": "arm-none-eabi-gcc --version",
+            "severity": "error",
+            "remediation": "Instalar el GNU Arm Embedded Toolchain."
+        },
+        {
+            "name": "Main source",
+            "description": "Punto de entrada principal",
+            "type": "file_exists",
+            "target": "src/main.c",
+            "severity": "error"
+        },
+        {
+            "name": "Linker script",
+            "description": "Archivo de configuración de memoria",
+            "type": "file_exists",
+            "target": "stm32_flash.ld",
+            "severity": "error"
+        }
+    ]
+}

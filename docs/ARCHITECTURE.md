@@ -1,0 +1,42 @@
+# 🏗️ Arquitectura y Decisiones de Diseño
+
+Este documento describe las decisiones técnicas y la estructura del **Project Readiness Checker**.
+
+## 🎯 Objetivos del Diseño
+
+1.  **Extensibilidad:** Permitir agregar nuevos tipos de validaciones sin modificar el núcleo del motor.
+2.  **Desacoplamiento:** Separar la lógica de validación de la lógica de presentación (formateadores).
+3.  **Portabilidad:** Funcionar en diferentes sistemas operativos (Windows, Linux, macOS) gracias a Python.
+4.  **Facilidad de Uso:** Configuración simple basada en YAML/JSON que no requiere conocimientos de programación.
+
+## 🧱 Componentes Principales
+
+### 1. Modelos de Datos (`src/models.py`)
+Utilizamos **Pydantic** para definir los esquemas de configuración y reportes. Esto garantiza que cualquier error en el archivo de configuración sea detectado inmediatamente al cargar el programa.
+
+### 2. Motor de Reglas (`src/checkers/engine.py`)
+El `CheckerEngine` es el corazón del sistema. Itera sobre las reglas definidas y utiliza la lógica adecuada según el `RuleType`. Se ha diseñado para ser fácilmente extendible mediante el patrón de estrategia o simplemente agregando nuevos evaluadores en el método `_evaluate_rule`.
+
+### 3. Sistema de Formateo (`src/formatters/`)
+Implementamos una clase base abstracta `Formatter` para asegurar que todos los formatos de salida sigan el mismo contrato.
+- **CLIFormatter:** Utiliza la librería `rich` para crear tablas y paneles estéticos en la terminal.
+- **JSONFormatter:** Facilita la integración con pipelines de CI/CD.
+- **HTMLFormatter:** Utiliza `Jinja2` para generar reportes visuales que pueden ser compartidos fácilmente.
+
+### 4. CLI (`src/cli.py`)
+Construido con `Typer` para una experiencia de usuario moderna, con ayuda integrada y manejo de argumentos intuitivo.
+
+## 🛠️ Stack Tecnológico
+
+- **Python 3.8+**: Lenguaje base.
+- **Typer**: Interfaz de línea de comandos.
+- **Pydantic**: Validación de datos.
+- **Rich**: Formateo de texto en consola.
+- **Jinja2**: Motor de plantillas para reportes HTML.
+- **Pytest**: Framework de pruebas unitarias.
+
+## 📈 Evolución Futura
+
+- Soporte para reglas personalizadas mediante scripts de Python externos.
+- Integración nativa con GitHub Actions.
+- Más validadores (ej. tamaño de archivo, permisos, hashes de archivos).

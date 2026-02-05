@@ -1,0 +1,28 @@
+{
+    "project_name": "Drone Frame V2",
+    "project_type": "hardware",
+    "rules": [
+        {
+            "name": "BOM exists",
+            "description": "Lista de materiales (Bill of Materials)",
+            "type": "file_exists",
+            "target": "docs/BOM.csv",
+            "severity": "error",
+            "remediation": "Exportar el BOM desde el software de CAD."
+        },
+        {
+            "name": "STEP models",
+            "description": "Modelos 3D para fabricación",
+            "type": "dir_exists",
+            "target": "cad/export",
+            "severity": "warning"
+        },
+        {
+            "name": "Assembly Instructions",
+            "description": "Guía de ensamblaje inicial",
+            "type": "file_exists",
+            "target": "docs/ASSEMBLY.md",
+            "severity": "error"
+        }
+    ]
+}
