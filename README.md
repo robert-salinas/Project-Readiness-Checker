@@ -65,6 +65,3 @@ rules:
 - [Arquitectura y Decisiones de Diseño](docs/ARCHITECTURE.md)
 - [Guía de Contribución](docs/CONTRIBUTING.md)
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
