@@ -3,7 +3,7 @@
 [![Python Version](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/tests.yml/badge.svg)](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/tests.yml)
-[![Build Status](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/lint.yml/badge.svg)](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/lint.yml)
+[![Linting](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/lint.yml/badge.svg)](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/lint.yml)
 
 **PRC** es una herramienta de línea de comandos diseñada para ingenieros que necesitan validar el estado de sus proyectos (Software, Hardware o Sistemas Embebidos) antes de un lanzamiento, entrega o revisión de diseño.
 
@@ -18,7 +18,7 @@ En proyectos complejos y multidisciplinarios, es común olvidar archivos crític
 - 📊 **Reportes Multi-formato:** Salida visual en CLI, exportación a JSON para CI/CD, y reportes HTML interactivos.
 - ⚙️ **Severidad Configurable:** Define qué fallos son críticos (`error`), advertencias (`warning`) o simple información (`info`).
 
-## �️ Stack Tecnológico
+## 🛠️ Stack Tecnológico
 
 - **Python 3.11+**
 - **Typer** (CLI Interface)
@@ -27,7 +27,7 @@ En proyectos complejos y multidisciplinarios, es común olvidar archivos crític
 - **Jinja2** (HTML Reports)
 - **Pytest** (Testing Framework)
 
-## �🚀 Instalación Rápida (< 5 minutos)
+## 🚀 Instalación Rápida (< 5 minutos)
 
 ```bash
 # Clonar el repositorio
@@ -92,4 +92,3 @@ Este proyecto está bajo la Licencia **MIT**. Ver el archivo [LICENSE](LICENSE) 
 
 ---
 Desarrollado con ❤️ por [Robert Salinas](https://github.com/robert-salinas)
-

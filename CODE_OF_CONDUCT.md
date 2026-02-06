@@ -32,11 +32,10 @@ Los mantenedores del proyecto tienen el derecho y la responsabilidad de eliminar
 
 Este Código de Conducta se aplica tanto dentro de los espacios del proyecto como en los espacios públicos cuando un individuo representa al proyecto o a su comunidad. Ejemplos de representación de un proyecto o comunidad incluyen el uso de una dirección de correo electrónico oficial del proyecto, la publicación a través de una cuenta oficial de medios sociales, o actuar como un representante designado en un evento online u offline.
 
-## Ejecución
 
-Instancias de comportamiento abusivo, acosador o inaceptable pueden ser reportadas contactando al equipo del proyecto en [robert.salinas@example.com]. Todas las quejas serán investigadas y resultarán en una respuesta que se considere necesaria y apropiada a las circunstancias. El equipo del proyecto está obligado a mantener la confidencialidad respecto al reportero de un incidente. Mayores detalles sobre las políticas de ejecución específicas pueden ser publicadas por separado.
+## Aplicación
 
-Los mantenedores del proyecto que no sigan o ejecuten el Código de Conducta de buena fe pueden enfrentar repercusiones temporales o permanentes según lo determinado por otros miembros del liderazgo del proyecto.
+Las instancias de comportamiento abusivo, acosador o inaceptable de otro modo pueden ser reportadas contactando al equipo del proyecto en [https://github.com/robert-salinas](https://github.com/robert-salinas). Todas las quejas serán revisadas e investigadas y resultarán en una respuesta que se considere necesaria y apropiada a las circunstancias. El equipo del proyecto está obligado a mantener la confidencialidad con respecto al reportero de un incidente.
 
 ## Atribución
 
