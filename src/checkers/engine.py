@@ -5,10 +5,13 @@ from typing import List
 from src.models import Rule, RuleType, CheckResult, ProjectConfig, ProjectReport, Severity
 
 class CheckerEngine:
+    """Motor encargado de ejecutar las validaciones configuradas."""
     def __init__(self, config: ProjectConfig):
+        """Inicializa el motor con una configuración de proyecto."""
         self.config = config
 
     def run_checks(self) -> ProjectReport:
+        """Ejecuta todas las reglas y genera un reporte consolidado."""
         results = []
         summary = {"passed": 0, "failed": 0, "warnings": 0, "errors": 0}
 
@@ -33,6 +36,7 @@ class CheckerEngine:
         )
 
     def _evaluate_rule(self, rule: Rule) -> CheckResult:
+        """Evalúa una regla individual según su tipo."""
         if rule.type == RuleType.FILE_EXISTS:
             passed = os.path.isfile(rule.target)
             return CheckResult(

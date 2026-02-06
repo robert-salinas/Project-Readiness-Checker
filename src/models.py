@@ -3,11 +3,13 @@ from pydantic import BaseModel, Field
 from enum import Enum
 
 class Severity(str, Enum):
+    """Niveles de severidad para las reglas de validación."""
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
 
 class RuleType(str, Enum):
+    """Tipos de validaciones soportadas por el motor."""
     FILE_EXISTS = "file_exists"
     DIR_EXISTS = "dir_exists"
     FILE_CONTAINS = "file_contains"
@@ -15,6 +17,7 @@ class RuleType(str, Enum):
     ENV_VAR_SET = "env_var_set"
 
 class Rule(BaseModel):
+    """Representa una única regla de validación."""
     name: str
     description: str
     type: RuleType
@@ -24,17 +27,20 @@ class Rule(BaseModel):
     remediation: Optional[str] = None
 
 class ProjectConfig(BaseModel):
+    """Configuración completa del proyecto y sus reglas."""
     project_name: str
     project_type: str
     rules: List[Rule]
 
 class CheckResult(BaseModel):
+    """Resultado de la ejecución de una regla."""
     rule: Rule
     passed: bool
     message: str
     details: Optional[str] = None
 
 class ProjectReport(BaseModel):
+    """Reporte consolidado de todas las validaciones ejecutadas."""
     project_name: str
     project_type: str
     results: List[CheckResult]

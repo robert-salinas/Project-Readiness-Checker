@@ -1,10 +1,11 @@
 [project]
-name = "project-readiness-checker"
+name = "Project-Readiness-Checker"
 version = "0.1.0"
-description = "A tool to verify project readiness based on configurable rules."
+description = "Herramienta de validación estructural para asegurar la consistencia y calidad de los entregables en proyectos multidisciplinarios."
 authors = [
-    { name = "Robert Esteban" }
+    { name = "Robert Salinas" }
 ]
+license = { text = "MIT" }
 dependencies = [
     "typer[all]>=0.9.0",
     "pydantic>=2.0.0",
@@ -12,7 +13,7 @@ dependencies = [
     "pyyaml>=6.0",
     "jinja2>=3.1.0"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 
 [project.scripts]
 prc = "src.cli:app"

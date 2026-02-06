@@ -35,6 +35,26 @@ Construido con `Typer` para una experiencia de usuario moderna, con ayuda integr
 - **Jinja2**: Motor de plantillas para reportes HTML.
 - **Pytest**: Framework de pruebas unitarias.
 
+## 📑 ADRs (Architecture Decision Records)
+
+### ADR 001: Uso de Pydantic para Validación de Configuración
+- **Estado:** Aceptado
+- **Contexto:** Necesitábamos una forma robusta de validar archivos YAML/JSON de entrada.
+- **Decisión:** Usar Pydantic v2 por su rendimiento y facilidad para definir esquemas complejos.
+- **Consecuencias:** Validación inmediata en tiempo de carga, mensajes de error claros para el usuario.
+
+### ADR 002: Desacoplamiento de Formateadores
+- **Estado:** Aceptado
+- **Contexto:** El usuario puede querer el reporte en diferentes formatos (Terminal, Web, CI/CD).
+- **Decisión:** Implementar el patrón Strategy con una clase base abstracta `Formatter`.
+- **Consecuencias:** Fácil de añadir nuevos formatos (ej. Markdown, PDF) sin tocar el motor de reglas.
+
+### ADR 003: Typer para la Interfaz de Usuario
+- **Estado:** Aceptado
+- **Contexto:** Queremos una CLI intuitiva y con autocompletado.
+- **Decisión:** Usar Typer debido a su integración con Type Hints de Python.
+- **Consecuencias:** Código de la CLI más limpio y generación automática de ayuda (`--help`).
+
 ## 📈 Evolución Futura
 
 - Soporte para reglas personalizadas mediante scripts de Python externos.

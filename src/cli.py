@@ -21,6 +21,9 @@ def check(
 ):
     """
     Ejecuta las validaciones definidas en el archivo de configuración.
+    
+    Permite cargar un archivo de reglas, ejecutar el motor de validación y
+    generar un reporte en el formato deseado (consola, JSON o HTML).
     """
     if not config_path.exists():
         console.print(f"[red]Error:[/] El archivo {config_path} no existe.")
