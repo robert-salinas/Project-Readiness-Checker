@@ -1,7 +1,6 @@
 import os
 import subprocess
 import re
-from typing import List
 from src.models import Rule, RuleType, CheckResult, ProjectConfig, ProjectReport, Severity
 
 class CheckerEngine:

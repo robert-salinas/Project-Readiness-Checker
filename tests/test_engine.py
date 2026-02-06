@@ -1,6 +1,4 @@
-import pytest
-import os
-from src.models import ProjectConfig, Rule, RuleType, Severity
+from src.models import ProjectConfig, Rule, RuleType
 from src.checkers.engine import CheckerEngine
 
 def test_file_exists_rule(tmp_path):

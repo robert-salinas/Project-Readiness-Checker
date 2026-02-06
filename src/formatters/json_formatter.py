@@ -1,4 +1,3 @@
-import json
 from src.models import ProjectReport
 from src.formatters.base import Formatter
 

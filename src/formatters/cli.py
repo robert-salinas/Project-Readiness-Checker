@@ -23,8 +23,10 @@ class CLIFormatter(Formatter):
                 status = "[yellow]WARNING[/]"
             
             severity_style = "white"
-            if res.rule.severity == Severity.ERROR: severity_style = "bold red"
-            elif res.rule.severity == Severity.WARNING: severity_style = "yellow"
+            if res.rule.severity == Severity.ERROR:
+                severity_style = "bold red"
+            elif res.rule.severity == Severity.WARNING:
+                severity_style = "yellow"
             
             table.add_row(
                 status,
