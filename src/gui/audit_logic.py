@@ -1,6 +1,10 @@
 import os
 import shutil
 from pathlib import Path
+import yaml
+import json
+from src.models import ProjectConfig, Rule, RuleType, Severity
+from src.checkers.engine import CheckerEngine
 
 def get_directory_size(path, calc_hidden=False):
     total_size = 0
@@ -41,7 +45,7 @@ def audit_directory(path_str, forbidden_files, calc_hidden=False):
         "total_size": format_size(get_directory_size(path, calc_hidden))
     }
     
-    # 1. Documentación
+    # 1. Documentación (Fija)
     readme = path / "README.md"
     if readme.exists():
         size = readme.stat().st_size
@@ -55,7 +59,7 @@ def audit_directory(path_str, forbidden_files, calc_hidden=False):
         results.append({"name": "README.md", "status": "ERROR", "msg": "No se encontró README.md", "icon": "❌"})
         summary["status"] = "ERROR"
 
-    # 2. Dependencias
+    # 2. Dependencias (Fija)
     deps = ["requirements.txt", "package.json", "pyproject.toml"]
     found_deps = [d for d in deps if (path / d).exists()]
     if found_deps:
@@ -63,13 +67,46 @@ def audit_directory(path_str, forbidden_files, calc_hidden=False):
     else:
         results.append({"name": "Dependencias", "status": "WARNING", "msg": "No se detectaron archivos de dependencias", "icon": "⚠️"})
 
-    # 3. Estructura
+    # 3. Estructura (Fija)
     essential = ["src", "tests"]
     missing = [d for d in essential if not (path / d).exists()]
     if not missing:
         results.append({"name": "Estructura", "status": "SUCCESS", "msg": "Carpetas /src y /tests presentes", "icon": "✅"})
     else:
         results.append({"name": "Estructura", "status": "WARNING", "msg": f"Faltan carpetas: {', '.join(missing)}", "icon": "⚠️"})
+
+    # --- 🔵 NUEVO: Reglas Dinámicas del Motor ---
+    yaml_config = path / "ready.yaml"
+    json_config = path / "ready.json"
+    config_file = yaml_config if yaml_config.exists() else json_config if json_config.exists() else None
+
+    if config_file:
+        try:
+            with open(config_file, 'r', encoding='utf-8') as f:
+                if config_file.suffix in ['.yaml', '.yml']:
+                    config_data = yaml.safe_load(f)
+                else:
+                    config_data = json.load(f)
+            
+            config = ProjectConfig(**config_data)
+            engine = CheckerEngine(config)
+            report = engine.run_checks()
+            
+            for res in report.results:
+                passed = res.passed
+                icon = "✅" if passed else "❌" if res.rule.severity == Severity.ERROR else "⚠️"
+                results.append({
+                    "name": res.rule.name,
+                    "status": "SUCCESS" if passed else "ERROR" if res.rule.severity == Severity.ERROR else "WARNING",
+                    "msg": res.message,
+                    "icon": icon,
+                    "remediation": res.rule.remediation if hasattr(res.rule, 'remediation') else None
+                })
+                if not passed and res.rule.severity == Severity.ERROR:
+                    summary["status"] = "ERROR"
+            
+        except Exception as e:
+            results.append({"name": "Reglas Motor", "status": "WARNING", "msg": f"Error cargando config: {str(e)}", "icon": "⚠️"})
 
     # 4. Limpieza (Archivos prohibidos)
     found_forbidden = []

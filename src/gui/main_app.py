@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
+import threading
 from datetime import datetime
 from src.gui.settings_manager import load_settings, save_settings, AUDIT_PROFILES
 from src.gui.audit_logic import audit_directory, clean_junk
@@ -156,6 +157,11 @@ class RSProjectReadinessApp(ctk.CTk):
             command=self.export_report
         )
         self.btn_export.place(relx=1.0, rely=0.5, anchor="e", x=0) # Aligned right inside actions_frame
+
+        # Progress Bar
+        self.progress_bar = ctk.CTkProgressBar(self.audit_panel, progress_color=COLOR_ACCENT, height=8)
+        self.progress_bar.pack(fill="x", padx=30, pady=(10, 5))
+        self.progress_bar.set(0)
 
         # Results Checklist Area
         self.results_frame = ctk.CTkScrollableFrame(self.audit_panel, label_text="Checklist de Auditoría", label_fg_color=COLOR_SIDEBAR, fg_color=COLOR_CARD, corner_radius=12)
@@ -320,25 +326,64 @@ class RSProjectReadinessApp(ctk.CTk):
             messagebox.showwarning("Atención", "Por favor, selecciona una carpeta primero.")
             return
         
+        # Deshabilitar botones para evitar spam
+        self.btn_run.configure(state="disabled", text="ANALIZANDO...")
+        if hasattr(self, 'btn_clean'): self.btn_clean.configure(state="disabled")
+        if hasattr(self, 'btn_settings'): self.btn_settings.configure(state="disabled")
+        
         self.log_info(f"Iniciando auditoría en: {self.selected_path}...")
         
-        # Clear previous results
+        # Iniciar Barra de Progreso
+        if hasattr(self, 'progress_bar'):
+            self.progress_bar.configure(mode="indeterminate")
+            self.progress_bar.start()
+        
+        # Limpiar resultados anteriores
         for widget in self.results_frame.winfo_children():
             widget.destroy()
             
-        # Get hidden calculation setting
+        # Obtener configuración
         calc_hidden = self.settings.get("calc_hidden", False)
+        forbidden = self.settings.get("forbidden_files", [])
         
-        data = audit_directory(self.selected_path, self.settings.get("forbidden_files", []), calc_hidden)
+        # Iniciar Hilo
+        thread = threading.Thread(target=self._run_audit_worker, args=(self.selected_path, forbidden, calc_hidden))
+        thread.daemon = True
+        thread.start()
+
+    def _run_audit_worker(self, path, forbidden, calc_hidden):
+        try:
+            data = audit_directory(path, forbidden, calc_hidden)
+            self.after(0, lambda: self._audit_completed(data))
+        except Exception as e:
+            self.after(0, lambda: self._audit_completed(None, error_msg=str(e)))
+
+    def _audit_completed(self, data, error_msg=None):
+        # Detener Barra de Progreso
+        if hasattr(self, 'progress_bar'):
+            self.progress_bar.stop()
+            self.progress_bar.configure(mode="determinate")
+            self.progress_bar.set(0)
+
+        # Re-habilitar botones
+        self.btn_run.configure(state="normal", text="EJECUTAR AUDITORÍA")
+        if hasattr(self, 'btn_clean'): self.btn_clean.configure(state="normal")
+        if hasattr(self, 'btn_settings'): self.btn_settings.configure(state="normal")
+        
+        if error_msg:
+            self.log_error(f"Error en auditoría: {error_msg}")
+            messagebox.showerror("Error", f"Ocurrió un error en la auditoría:\n{error_msg}")
+            return
+            
         if not data:
             self.log_error("No se pudo analizar la carpeta.")
             return
-        
+            
         self.audit_results = data
         results = data["results"]
         summary = data["summary"]
 
-        # Update KPIs
+        # Actualizar KPIs
         status_color = COLOR_SUCCESS if summary["status"] == "SUCCESS" else COLOR_ERROR
         self.kpi_status.configure(text=summary["status"], text_color=status_color)
         
@@ -350,7 +395,7 @@ class RSProjectReadinessApp(ctk.CTk):
         
         self.kpi_size.configure(text=summary["total_size"], text_color=COLOR_ACCENT)
 
-        # Show Checklist
+        # Mostrar Checklist
         for res in results:
             row = ctk.CTkFrame(self.results_frame, fg_color="transparent")
             row.pack(fill="x", pady=5)
@@ -363,7 +408,23 @@ class RSProjectReadinessApp(ctk.CTk):
             elif res["status"] == "ERROR": self.log_error(f"{res['name']}: {res['msg']}")
             else: self.log_info(f"{res['name']}: {res['msg']}")
 
+            # Botón de Ayuda / Remediación
+            if res.get("remediation"):
+                # Capturar res en el lambda con r=res
+                btn_help = ctk.CTkButton(
+                    row, 
+                    text="💡 Ayuda", 
+                    width=60, 
+                    height=20, 
+                    font=ctk.CTkFont(size=10), 
+                    fg_color="#3D4256", 
+                    hover_color="#4D5266", 
+                    command=lambda r=res: messagebox.showinfo("Guía de Remediación", f"Regla: {r['name']}\n\nAcción sugerida:\n{r['remediation']}")
+                )
+                btn_help.pack(side="right", padx=10)
+
         self.log_success("Auditoría completada.")
+
 
     def run_auto_clean(self):
         if not self.audit_results:
@@ -412,46 +473,104 @@ class RSProjectReadinessApp(ctk.CTk):
                 pass
 
         file_path = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=[("Text files", "*.txt"), ("All files", "*.*")],
+            defaultextension=".html",
+            filetypes=[("HTML files", "*.html"), ("Text files", "*.txt"), ("All files", "*.*")],
             initialdir=default_dir,
-            initialfilename=f"Audit_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+            initialfilename=f"Audit_Report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
         )
         
         if not file_path:
             return
             
         try:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write("========================================\n")
-                f.write("   RS PROJECT READINESS AUDIT REPORT\n")
-                f.write("========================================\n\n")
-                f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"Proyecto: {self.selected_path}\n")
-                f.write(f"Autor: {RS_AUTHOR}\n\n")
+            if file_path.endswith(".html"):
+                from src.formatters.html_formatter import HTMLFormatter
+                from src.models import ProjectReport, CheckResult, Rule, RuleType, Severity
                 
-                summary = self.audit_results["summary"]
-                f.write("RESUMEN GENERAL:\n")
-                f.write(f"- Estado: {summary['status']}\n")
-                f.write(f"- Perfil: {self.settings.get('audit_profile', 'Personalizado')}\n")
-                f.write(f"- Archivos Basura: {summary['junk_count']}\n")
-                f.write(f"- Documentación: {'OK' if summary['docs_found'] else 'FALTA'}\n")
-                f.write(f"- Peso Total: {summary['total_size']}\n\n")
-                
-                f.write("DETALLES DE LA INSPECCIÓN:\n")
+                report_results = []
                 for res in self.audit_results["results"]:
-                    f.write(f"{res['icon']} {res['name']}: {res['msg']}\n")
-                    if "files" in res and res["files"]:
-                        f.write("   Archivos detectados:\n")
-                        for file in res["files"]:
-                            f.write(f"     - {file}\n")
+                    passed = res["status"] == "SUCCESS"
+                    # Mapear severidad
+                    if res["status"] == "ERROR":
+                        sev = Severity.ERROR
+                    elif res["status"] == "WARNING":
+                        sev = Severity.WARNING
+                    else:
+                        sev = Severity.INFO
+                        
+                    rule = Rule(
+                        name=res["name"],
+                        description="",
+                        type=RuleType.FILE_EXISTS, # Dummy para compatibilidad
+                        target="",
+                        severity=sev
+                    )
+                    
+                    report_results.append(CheckResult(
+                        rule=rule,
+                        passed=passed,
+                        message=res["msg"]
+                    ))
                 
-                f.write("\n========================================\n")
-                f.write("   Generado por Project Readiness Checker\n")
-                f.write("========================================\n")
+                # Calcular sumario real para el HTML
+                passed_count = sum(1 for r in report_results if r.passed)
+                failed_count = sum(1 for r in report_results if not r.passed)
+                # Count errors and warnings
+                error_count = sum(1 for r in report_results if not r.passed and r.rule.severity == Severity.ERROR)
+                warning_count = sum(1 for r in report_results if not r.passed and r.rule.severity == Severity.WARNING)
+                
+                mapped_summary = {
+                    "passed": passed_count,
+                    "failed": failed_count,
+                    "errors": error_count,
+                    "warnings": warning_count
+                }
+                
+                report = ProjectReport(
+                    project_name=os.path.basename(self.selected_path) or "Proyecto",
+                    project_type=self.settings.get("audit_profile", "Estándar"),
+                    results=report_results,
+                    summary=mapped_summary
+                )
+                
+                formatter = HTMLFormatter()
+                html_content = formatter.format(report)
+                
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(html_content)
+            else:
+                # Soporte para TXT (Existente)
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write("========================================\n")
+                    f.write("   RS PROJECT READINESS AUDIT REPORT\n")
+                    f.write("========================================\n\n")
+                    f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write(f"Proyecto: {self.selected_path}\n")
+                    f.write(f"Autor: {RS_AUTHOR}\n\n")
+                    
+                    summary = self.audit_results["summary"]
+                    f.write("RESUMEN GENERAL:\n")
+                    f.write(f"- Estado: {summary['status']}\n")
+                    f.write(f"- Perfil: {self.settings.get('audit_profile', 'Personalizado')}\n")
+                    f.write(f"- Archivos Basura: {summary['junk_count']}\n")
+                    f.write(f"- Documentación: {'OK' if summary['docs_found'] else 'FALTA'}\n")
+                    f.write(f"- Peso Total: {summary['total_size']}\n\n")
+                    
+                    f.write("DETALLES DE LA INSPECCIÓN:\n")
+                    for res in self.audit_results["results"]:
+                        f.write(f"{res['icon']} {res['name']}: {res['msg']}\n")
+                        if "files" in res and res["files"]:
+                            f.write("   Archivos detectados:\n")
+                            for file in res["files"]:
+                                f.write(f"     - {file}\n")
+                    
+                    f.write("\n========================================\n")
+                    f.write("   Generado por Project Readiness Checker\n")
+                    f.write("========================================\n")
                 
             self.log_success(f"Reporte exportado exitosamente a: {file_path}")
             messagebox.showinfo("Éxito", "El reporte ha sido exportado correctamente.")
+
         except Exception as e:
             self.log_error(f"Error al exportar reporte: {str(e)}")
             messagebox.showerror("Error", f"No se pudo exportar el reporte: {str(e)}")

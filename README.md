@@ -5,7 +5,7 @@
 [![Tests](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/tests.yml/badge.svg)](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/tests.yml)
 [![Linting](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/lint.yml/badge.svg)](https://github.com/robert-salinas/Project-Readiness-Checker/actions/workflows/lint.yml)
 
-**PRC** es una herramienta de línea de comandos diseñada para ingenieros que necesitan validar el estado de sus proyectos (Software, Hardware o Sistemas Embebidos) antes de un lanzamiento, entrega o revisión de diseño.
+**PRC** es una herramienta versátil que combina la potencia de una **Línea de Comandos (CLI)** y la comodidad de una **Interfaz Gráfica (GUI)** moderna. Está diseñada para ingenieros que necesitan validar el estado de sus proyectos (Software, Hardware o Sistemas Embebidos) antes de un lanzamiento, entrega o revisión de diseño.
 
 ## 💡 El Problema
 
@@ -13,9 +13,10 @@ En proyectos complejos y multidisciplinarios, es común olvidar archivos crític
 
 ## ✨ Características Únicas
 
+- 💻 **Interfaz Dual (CLI & GUI):** Acceso rápido vía consola de comandos para tuberías de CI/CD, o interfaz gráfica interactiva con indicadores en tiempo real.
 - 🛠️ **Motor de Reglas Flexible:** Valida existencia de archivos, directorios, contenido de archivos, ejecución de comandos y variables de entorno.
 - 📁 **Multi-dominio:** Configuraciones listas para usar en proyectos de Hardware, Software y Sistemas Embebidos.
-- 📊 **Reportes Multi-formato:** Salida visual en CLI, exportación a JSON para CI/CD, y reportes HTML interactivos.
+- 📊 **Reportes Multi-formato:** Salida visual en CLI, exportación JSON para integración, y reportes HTML interactivos (Soportados en GUI y CLI).
 - ⚙️ **Severidad Configurable:** Define qué fallos son críticos (`error`), advertencias (`warning`) o simple información (`info`).
 
 ## 🛠️ Stack Tecnológico
@@ -40,7 +41,16 @@ pip install -e .
 
 ## 🛠️ Uso Básico
 
-Para verificar un proyecto usando uno de los ejemplos incluidos:
+Para verificar un proyecto utilizando la interfaz visual (Auditorías Asíncronas, KPIs, Botón de Ayuda):
+
+```bash
+# Lanzar la aplicación
+python main.py
+```
+
+### 💻 Línea de Comandos (CLI)
+
+Para verificar un proyecto usando la terminal y reglas estructuradas:
 
 ```bash
 # Verificación básica en consola
@@ -48,9 +58,6 @@ prc check examples/software_project.json
 
 # Generar un reporte HTML
 prc check examples/software_project.json --format html --output reporte.html
-
-# Salida en formato JSON para integración
-prc check examples/software_project.json --format json
 ```
 
 ## 📝 Configuración de Reglas
